@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/olga/projects/sdlproject/build",
+  "command": "/usr/bin/clang++ -I/Users/olga/projects/sdlproject/sdlproject -I/usr/local/Cellar/sdl2/2.28.5/include -isystem /usr/local/Cellar/sdl2/2.28.5/include/SDL2 -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -o CMakeFiles/sdlproject.dir/src/main.cpp.o -c /Users/olga/projects/sdlproject/src/main.cpp",
+  "file": "/Users/olga/projects/sdlproject/src/main.cpp",
+  "output": "CMakeFiles/sdlproject.dir/src/main.cpp.o"
+}
+]
