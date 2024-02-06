@@ -1,110 +1,73 @@
-#include <iostream>
 #include <SDL2/SDL.h>
+#include <emscripten.h>
+#include <iostream>
 
-using namespace std;
+struct Context {
+  std::string title;
+  int width, height;
+  SDL_Renderer * renderer;
+  SDL_Event event;
+  SDL_Rect rect, rect2;
+  SDL_Texture * logo;
+};
 
-int WINDOW_WIDTH = 512;
-int WINDOW_HEIGHT = 284;
-SDL_Window* g_main_window;
-SDL_Renderer* g_main_renderer;
+void callback(void * arg){
+  Context * context = static_cast<Context*>(arg);
+    while(SDL_PollEvent(&context->event)){
+      if( context->event.type == SDL_QUIT ){
+        exit(0);
+      }else if( context->event.type == SDL_MOUSEBUTTONDOWN ){
+        context->rect2.x -= 20;
+      }
+    }
 
-namespace Colors
-{
-    const SDL_Color Black = { 0, 0, 0, SDL_ALPHA_OPAQUE};
+    SDL_RenderClear(context->renderer);
+    SDL_SetRenderDrawColor(context->renderer, 255, 255, 255, 255);
+    //SDL_RenderDrawRect(renderer, &rect2);
+    SDL_RenderFillRect(context->renderer, &context->rect2);
+    SDL_SetRenderDrawColor(context->renderer, 9, 20, 33, 255);
+    SDL_RenderCopy(context->renderer, context->logo, NULL, &context->rect);
+    SDL_RenderPresent(context->renderer);
 }
 
-static bool Init()
-{
-    if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
-    {
-        cout << "SDL_Init failed with error: " << SDL_GetError() << endl;
-        return EXIT_FAILURE;
-    }
+int main(int argc, char** argv) {
+  Context context;
+  SDL_Init(SDL_INIT_EVERYTHING);
 
-    g_main_window = SDL_CreateWindow
-    (
-        "SDL Create Window (512x284)",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT,
-        SDL_WINDOW_OPENGL
-    );
+  context.title = "SDL2 It's Works!";
+  context.width = 1280;
+  context.height = 720;
 
-    if (g_main_window == nullptr)
-    {
-        cout << "Unable to create the main window. Error: " << SDL_GetError() << endl;
-        SDL_Quit();
-        return EXIT_FAILURE;
-    }
+  SDL_Window* window = SDL_CreateWindow(
+      context.title.c_str(),
+      50, 30,
+      context.width, context.height,
+      SDL_WINDOW_SHOWN
+      );
 
-    g_main_renderer = SDL_CreateRenderer(g_main_window, -1, SDL_RENDERER_PRESENTVSYNC);
-
-    return true;
-}
-
-void Shutdown()
-{
-    if (g_main_window != nullptr)
-    {
-        SDL_DestroyWindow(g_main_window);
-        g_main_window = nullptr;
-    }
-
-    if (g_main_renderer != nullptr)
-    {
-        SDL_DestroyRenderer(g_main_renderer);
-        g_main_renderer = nullptr;
-    }
-
-    SDL_Quit();
-}
-
-static void ClearScreen(SDL_Renderer* renderer)
-{
-    SDL_SetRenderDrawColor(renderer, Colors::Black.r, Colors::Black.g, Colors::Black.b, Colors::Black.a);
-    SDL_RenderClear(renderer);
-}
+  SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
+  context.renderer = renderer;
 
 
-int main()
-{
-    if (Init() == false)
-    {
-        Shutdown();
-    }
+  SDL_Surface * surface = SDL_LoadBMP("./sdl.bmp");
+  context.logo = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_FreeSurface(surface);
 
-    SDL_Event event;
-    bool running = true;
+  context.rect.x = 50;
+  context.rect.y = 20;
+  context.rect.w = surface->w;
+  context.rect.h = surface->h;
 
-    while (running)
-    {
-        ClearScreen(g_main_renderer);
+  context.rect2.x = 800;
+  context.rect2.y = 20;
+  context.rect2.w = 300;
+  context.rect2.h = 300;
 
+  emscripten_set_main_loop_arg(callback, &context, -1, 1);
 
-    if (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-            case SDL_KEYDOWN:
-            {
-                running = event.key.keysym.scancode != SDL_SCANCODE_ESCAPE;
-                break;
-            }
-            case SDL_QUIT:
-            {
-                running = false;
-                break;
-            }
-            default:
-            break;
-        }
-    }
-
-    SDL_RenderPresent(g_main_renderer);
-
-    }
-    
-    Shutdown();
-    return EXIT_SUCCESS;    
+  SDL_DestroyTexture(context.logo);
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+  return 0;
 }

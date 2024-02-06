@@ -14,7 +14,7 @@ CostDataFile:
 Site: MacBook-Air-Olga.local
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
-BuildName: Darwin-clang++
+BuildName: Emscripten-em++
 
 # Subprojects
 LabelsForSubprojects: 
@@ -45,7 +45,7 @@ SVNOptions:
 SVNUpdateOptions: 
 
 # Git options
-GITCommand: 
+GITCommand: /usr/local/bin/git
 GITInitSubmodules: 
 GITUpdateOptions: 
 GITUpdateCustom: 
@@ -58,13 +58,13 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: 
+UpdateCommand: /usr/local/bin/git
 UpdateOptions: 
-UpdateType: 
+UpdateType: git
 
 # Compiler info
-Compiler: /usr/bin/clang++
-CompilerVersion: 13.0.0.13000029
+Compiler: /Users/olga/projects/sdlproject/emsdk/upstream/emscripten/em++
+CompilerVersion: 18.0.0
 
 # Dynamic analysis (MemCheck)
 PurifyCommand: 
